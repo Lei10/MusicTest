@@ -3,11 +3,23 @@
 		<musichead title = "网易云音乐" :icon = "false"></musichead>
 		<view class="container">
 			<scroll-view scroll-y="true">
-				<view class="index-search">
+				<view class="index-search" @tap="handleToSearch">
 					<text class="iconfont iconsearch"></text>
 					<input type="text" placeholder="搜索歌曲" />
 				</view>
-				<view class="index-list">
+				<view v-if="isLoading">
+						<m-for-skeleton
+				        :avatarSize="200"
+				        :row="3"
+				        :loading="isLoading"
+				        isarc="square"
+						:titleStyle="{}"
+				        v-for="(item,key) in 4"
+						:title="false"
+				        :key="key">
+				        </m-for-skeleton>
+				    </view>
+				<view class="index-list" v-else>
 					<!-- <view class="index-list-item">
 						<view class="index-list-img">
 							<image src="../../static/wangyiyunyinyue.png"></image>
@@ -47,19 +59,26 @@
 	import '@/common/iconfont.css'
 	import musichead from '../../components/musichead/musichead.vue'
 	import { topList } from '../../common/api.js'
+	import mForSkeleton from "@/components/m-for-skeleton/m-for-skeleton";
 	export default {
 		data() {
 			return {
-				topList : []
+				topList : [],
+				isLoading : true
 			}
 		},
 		components : {
-			musichead
+			musichead,
+			mForSkeleton
 		},
 		onLoad() {
 			topList().then((res)=>{
 				if(res.length){
-					this.topList = res;
+					setTimeout(()=>{
+						this.topList = res;
+						this.isLoading = false;
+					},1000);
+					
 				}
 			});
 		},
@@ -67,6 +86,11 @@
 			handleToList(itemId){
 				uni.navigateTo({
 					url: '../list/list?itemId=' + itemId,
+				});
+			},
+			handleToSearch(){
+				uni.navigateTo({
+					url: '../search/search',
 				});
 			}
 		}
